@@ -11,42 +11,27 @@ interface ForecastResponse {
   };
 }
 
-type Callback = (error?: string, data?: string) => void;
-
 const baseURL = 'http://api.weatherstack.com';
 const accessToken = process.env.WEATHER_STACK_ACCESS_TOKEN || '';
 
-export const forecast = async (latitude: string, longitude: string, callback: Callback) => {
+export const forecast = async (latitude: number, longitude: number) => {
   const url = `${baseURL}/current?access_key=${accessToken}&query=${latitude},${longitude}`;
 
   try {
     const { data } = (await axios.get(url)) as ForecastResponse;
 
     if (!data || data.error) {
-      return callback('Unable to find location. Try another search.');
+      throw new Error('Unable to find location. Try another search.');
     }
 
     const { weather_descriptions, temperature, feelslike } = data.current;
 
-    callback(
-      undefined,
-      `${weather_descriptions[0]}. It is currently ${temperature} degrees out. It feels like ${feelslike} degrees out.`,
-    );
+    return `${weather_descriptions[0]}. It is currently ${temperature} degrees out. It feels like ${feelslike} degrees out.`;
   } catch (error) {
-    callback('Unable to connect to weather service!');
+    if (error === 'Unable to find location. Try another search.') {
+      throw new Error(error);
+    }
+
+    throw new Error('Unable to connect to weather service!');
   }
 };
-
-// request({ url, json: true }, (error, { body }) => {
-//   if (error) {
-//     callback('Unable to connect to weather service!');
-//   } else if (body.error) {
-//     callback('Unable to find location. Try another search.');
-//   } else {
-//     const { weather_descriptions, temperature, feelslike } = body.current;
-//     callback(
-//       undefined,
-//       `${weather_descriptions[0]}. It is currently ${temperature} degrees out. It feels like ${feelslike} degrees out.`,
-//     );
-//   }
-// });
