@@ -27,7 +27,7 @@ export const geocode = async (address: string, callback: Callback) => {
     const { data } = (await axios.get(url)) as GeocodeResponse;
 
     if (!data || !data.features || data.features.length === 0) {
-      throw new Error('Unable to find location. Try another search.');
+      return callback('Unable to find location. Try another search.');
     }
 
     const { center, place_name } = data.features[0];
