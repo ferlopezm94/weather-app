@@ -9,35 +9,31 @@ interface GeocodeResponse {
   };
 }
 
-interface CallbackData {
-  latitude: number;
-  longitude: number;
-  location: string;
-}
-
-type Callback = (error?: string, data?: CallbackData) => void;
-
 const baseURL = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 const accessToken = process.env.MAPBOX_ACCESS_TOKEN || '';
 
-export const geocode = async (address: string, callback: Callback) => {
+export const geocode = async (address: string) => {
   const url = `${baseURL}/${encodeURIComponent(address)}.json?access_token=${accessToken}&limit=1`;
 
   try {
     const { data } = (await axios.get(url)) as GeocodeResponse;
 
     if (!data || !data.features || data.features.length === 0) {
-      return callback('Unable to find location. Try another search.');
+      throw new Error('Unable to find location. Try another search.');
     }
 
     const { center, place_name } = data.features[0];
 
-    callback(undefined, {
+    return {
       latitude: center[1],
       longitude: center[0],
       location: place_name,
-    });
+    };
   } catch (error) {
-    callback('Unable to connect to location services!');
+    if (error === 'Unable to find location. Try another search.') {
+      throw new Error(error);
+    }
+
+    throw new Error('Unable to connect to location services!');
   }
 };
