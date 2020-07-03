@@ -28,8 +28,8 @@ export const forecast = async (latitude: number, longitude: number) => {
 
     return `${weather_descriptions[0]}. It is currently ${temperature} degrees out. It feels like ${feelslike} degrees out.`;
   } catch (error) {
-    if (error === 'Unable to find location. Try another search.') {
-      throw new Error(error);
+    if (error.message === 'Unable to find location. Try another search.') {
+      throw new Error(error.message);
     }
 
     throw new Error('Unable to connect to weather service!');
