@@ -20,25 +20,7 @@ hbs.registerPartials(partialsDirectoryPath);
 // Setup static directory to serve
 app.use(express.static(publicDirectoryPath));
 
-const main = async () => {
-  const address = process.argv[2];
-
-  if (!address) {
-    return console.log('Please provide a location.');
-  }
-
-  try {
-    const { latitude, longitude, location } = await geocode(address);
-    const forecastData = await forecast(latitude, longitude);
-
-    console.log(`${location}.\n${forecastData}`);
-  } catch (error) {
-    console.error('error :>> ', error);
-  }
-};
-
-main();
-
+// Setuo routes handlers
 app.get('', (_req, res) => {
   res.render('index', {
     title: 'Weather',
@@ -61,11 +43,28 @@ app.get('/help', (_req, res) => {
   });
 });
 
-app.get('/weather', (_req, res) => {
-  res.send({
-    forecast: 'It is raining',
-    location: 'Chiapas',
-  });
+app.get('/weather', async (req, res) => {
+  const { address } = req.query;
+
+  if (!address) {
+    return res.send({
+      error: 'You must provide an address!',
+    });
+  }
+
+  try {
+    const { latitude, longitude, location } = await geocode(address as string);
+    const forecastData = await forecast(latitude, longitude);
+
+    res.send({
+      forecast: forecastData,
+      location,
+      address,
+    });
+  } catch (error) {
+    console.log('error :>> ', error.message);
+    res.send({ error: error.message });
+  }
 });
 
 app.get('/help/*', (_req, res) => {
