@@ -12,7 +12,9 @@
     "sourceType": "module"
   },
   "globals": {
-    "console": "readonly"
+    "console": "readonly",
+    "fetch": "readonly",
+    "document": "readonly"
   },
   "env": {
     "node": true
