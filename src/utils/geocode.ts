@@ -30,8 +30,8 @@ export const geocode = async (address: string) => {
       location: place_name,
     };
   } catch (error) {
-    if (error === 'Unable to find location. Try another search.') {
-      throw new Error(error);
+    if (error.message === 'Unable to find location. Try another search.') {
+      throw new Error(error.message);
     }
 
     throw new Error('Unable to connect to location services!');
