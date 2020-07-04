@@ -1,6 +1,6 @@
 {
   "name": "weather-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Get real-time weather data based on a given address.",
   "main": "build/app.js",
   "author": "Fenando López Martínez",
